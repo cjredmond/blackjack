@@ -40,6 +40,7 @@ class Player:
     def add_to_hand(self, card):
         self.hand.append(card)
     def show(self):
+        print("This is {}'s hand: ".format(self.name))
         for card in self.hand:
             print(card.value, card.suit)
     def count_score(self, card):
@@ -54,15 +55,90 @@ class Player:
                 self.score += 1
         else:
             self.score += card.value
-        return self.score
+
+    def show_score(self):
+        return "This is {}'s score: {}".format(self.name, self.score)
+
+
     def check_bust(self):
         if self.score > 21:
             print("METHOD BUST")
             return True
+        else:
+            return False
+
+    def hit_or_stand(self):
+        if self.score > 21:
+            print("Sorry {} but your already bust".format(self.name))
+        elif self.score == 21:
+            print("{}, you already have 21".format(self.name))
+        else:
+            decision = input("{}, do you want to (H)it or (S)tand? \n >".format(self.name)).upper()
+            if decision == "H":
+                return True
+            else:
+                return False
+
 
 connor = Player("Connor")
 dealer = Player("Dealer")
-tens = ["K", "Q", "J"]
+
+players = [connor, dealer]
+def initialize_game(players):
+    for player in players:
+        first_card = casino.deal()
+        player.add_to_hand(first_card)
+        player.count_score(first_card)
+        second_card = casino.deal()
+        player.add_to_hand(second_card)
+        player.count_score(second_card)
+        print(player.show())
+        print("\n")
+    print("\n\n")
+
+
+
+
+
+
+def playing_backjack(players):
+    initialize_game(players)
+    for player in players:
+        print(player.show_score())
+    print("\n")
+
+    while players[0].check_bust() == False or players[1].check_bust() == False:
+                if players[0].check_bust() == False:
+                    print(players[0].show_score())
+
+                    choice = players[0].hit_or_stand()
+                    if choice == True:
+                        new_card = casino.deal()
+                        new_card.show()
+                        players[0].add_to_hand(new_card)
+                        players[0].count_score(new_card)
+                        print(players[0].show_score())
+                    
+
+
+                else:
+                    pass
+
+
+
+
+
+                print(players[1].show_score())
+                if players[1].check_bust() == False:
+                    choice = players[1].hit_or_stand()
+                    if choice == True:
+                        new_card = casino.deal()
+                        new_card.show()
+                        players[1].add_to_hand(new_card)
+                        players[1].count_score(new_card)
+                        print(players[1].show_score())
+                else:
+                    pass
 
 
 
@@ -71,25 +147,14 @@ tens = ["K", "Q", "J"]
 
 
 
-def playing_backjack():
-    casino = Deck()
-    turn = 1
-    for number in range(10):
-        turn = turn * -1
-        if connor.check_bust() == True:
-            print("DONE")
-            break
-        if turn > 0:
-            print("Connor's Hand")
-            new_card = casino.deal()
-            print(new_card.show())
-            print(connor.count_score(new_card))
 
-            print("\n \n \n")
-        elif turn < 0:
-            print("Dealer's Hand")
-            dealer.add_to_hand(casino.deal())
-            dealer.show()
-            print("\n\n\n")
 
-playing_backjack()
+
+
+
+
+
+
+
+
+playing_backjack(players)
