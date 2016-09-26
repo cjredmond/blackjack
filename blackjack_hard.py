@@ -83,9 +83,19 @@ class Player:
         self.hand = []
     def buy_in(self):
         self.money -= 10
-        print("You now have ${}".format(self.money))
+        print("{} now has ${}".format(self.name, self.money))
     def win_money(self):
-        connor.money += 20
+        self.money += 20
+    def beat_dealer(self):
+        if self.score < 22 and dealer.score > 21:
+            return True
+        elif self.score < 22 and dealer.score < 22:
+            if self.score > dealer.score:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 class Dealer(Player):
     def hit_or_stand(self):
@@ -93,20 +103,25 @@ class Dealer(Player):
             return False
         else:
             return True
-    def show(self):
-        print(self.hand)
+    def buy_in(self):
+        pass
+    def win_money(self):
+        pass
+    def beat_dealer(self):
+        pass
+    
 
 
 
 
 connor = Player("Connor")
-dealer = Player("Dealer")
+dealer = Dealer("Dealer")
 bill = Player("Bill")
 steve = Player("Steve")
 nick = Player("Nick")
 jack = Player("Jack")
 
-players = [connor, dealer]
+players = [connor, bill, steve, nick, jack, dealer]
 def initialize_game(players):
     casino = Deck()
     for player in players:
@@ -119,34 +134,14 @@ def initialize_game(players):
         player.add_to_hand(second_card)
         player.count_score(second_card)
         print("\n")
-    connor.show()
-    connor.buy_in()
+        player.show()
+        player.buy_in()
     print("\n")
 
-def compare_scores(players):
-    print("{}, your score is {}".format(connor.name, connor.score))
-    print("The Dealer's score is {}".format(dealer.score))
-
-    if dealer.score == 21:
-        print("The dealer has 21, the Dealer wins")
-    elif connor.score == 21 and dealer.score != 21:
-        print("You've won with 21!")
-    elif connor.score == dealer.score:
-        print("Sorry, the dealer wins a tie")
-    elif connor.score > 21 and dealer.score > 21:
-        print("Both busted")
-    else:
-        if connor.score < 21 and dealer.score < 21:
-            if connor.score > dealer.score:
-                connor.win_money()
-                print("You beat the dealer")
-            else:
-                print("The dealer has a better score")
-
-
-
 def playing_backjack(players):
-    casino = Deck()
+    for player in players:
+        if player.money == 0:
+            players.remove(player)
     initialize_game(players)
     print(connor.show_score())
     print("\n")
@@ -161,26 +156,39 @@ def playing_backjack(players):
         else:
             print("You chose to stand")
             break
-    while dealer.check_bust() == False:
-        choice = True
-        if connor.score <= dealer.score:
-            choice = False
-        elif connor.score > 21:
-            choice = False
-        if choice == True:
-            print("The dealer chose to hit")
-            new_card = casino.deal()
-            new_card.show()
-            dealer.add_to_hand(new_card)
-            dealer.count_score(new_card)
+
+    for player in players:
+        if player == connor:
+            pass
         else:
-            break
-    dealer.show()
-    compare_scores(players)
-    if dealer.check_bust() == True:
-        connor.win_money()
+            print("It is now {}'s turn".format(player.name))
+            while player.check_bust() == False:
+                choice = True
+                if player.score > 16:
+                    choice = False
+                if choice == True:
+                    new_card = casino.deal()
+                    new_card.show()
+                    player.add_to_hand(new_card)
+                    player.count_score(new_card)
+                else:
+                    print("{} has chose to stand".format(player.name))
+                    break
+            if player.check_bust() == True:
+                print("{} has busted".format(player.name))
+    for player in players:
+        player.show()
+        print(player.show_score())
+    for player in players:
+        if player == dealer:
+            pass
+        else:
+            if player.beat_dealer() == True:
+                player.win_money()
+
     play_again = input("Do you want to play again? Y/n:   ").lower()
     if play_again == "y":
+        casino.show_deck()
         playing_backjack(players)
 
 playing_backjack(players)
